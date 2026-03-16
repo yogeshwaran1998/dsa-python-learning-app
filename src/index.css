@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Base styles */
+body {
+  @apply antialiased;
+}
+
+/* Light mode defaults */
+:root {
+  color-scheme: light dark;
+
+  /* Background colors */
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-bg-tertiary: #f1f5f9;
+
+  /* Text colors */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+
+  /* Accent colors */
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+
+  /* Border colors */
+  --color-border: #e2e8f0;
+  --color-border-hover: #cbd5e1;
+
+  /* Card colors */
+  --color-card-bg: #ffffff;
+  --color-card-border: #e2e8f0;
+
+  /* Code colors */
+  --color-code-bg: #f8fafc;
+  --color-code-text: #334155;
+
+  /* Success, Warning, Error */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+}
+
+/* Dark mode styles */
+.dark {
+  color-scheme: dark;
+
+  /* Background colors */
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+
+  /* Text colors */
+  --color-text-primary: #f8fafc;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+
+  /* Accent colors */
+  --color-accent: #60a5fa;
+  --color-accent-hover: #3b82f6;
+
+  /* Border colors */
+  --color-border: #334155;
+  --color-border-hover: #475569;
+
+  /* Card colors */
+  --color-card-bg: #1e293b;
+  --color-card-border: #334155;
+
+  /* Code colors */
+  --color-code-bg: #1e293b;
+  --color-code-text: #cbd5e1;
+
+  /* Success, Warning, Error */
+  --color-success: #4ade80;
+  --color-warning: #fbbf24;
+  --color-error: #f87171;
+}
+
+/* Custom utility classes using CSS variables */
+.bg-primary {
+  background-color: var(--color-bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+
+.bg-tertiary {
+  background-color: var(--color-bg-tertiary);
+}
+
+.text-primary {
+  color: var(--color-text-primary);
+}
+
+.text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+.border-default {
+  border-color: var(--color-border);
+}
+
+.border-default-hover {
+  border-color: var(--color-border-hover);
+}
+
+.card {
+  background-color: var(--color-card-bg);
+  border-color: var(--color-card-border);
+}
+
+.code-block {
+  background-color: var(--color-code-bg);
+  color: var(--color-code-text);
+}
+
+/* Apply background to body */
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
