@@ -67,11 +67,11 @@ App starts at `http://localhost:5173`.
 
 ## Content Pipeline
 
-Content (`.md` theory files and `.py` code files) lives in the **repo root** alongside the app — for example `../01_arrays_strings/arrays_strings.md`. The script `dsa-learning-app/scripts/sync-content.mjs` mirrors these into `dsa-learning-app/public/content/` so Vite can serve them as static assets.
+Content (`.md` theory files and `.py` code files) lives in the **`content/`** directory inside this repo — for example `content/01_arrays_strings/arrays_strings.md`. The script `scripts/sync-content.mjs` mirrors these into `public/content/` so Vite can serve them as static assets.
 
 The sync runs automatically on `npm run dev` and `npm run build` (via `predev`/`prebuild` hooks). `public/content/` is git-ignored — never edit it by hand.
 
-Topic metadata (id, title, file names, category) is the single source of truth in `src/data/topicsConfig.js`. To add a topic: add an entry there and drop the matching `.md` + `.py` files in the root folder.
+Topic metadata (id, title, file names, category) is the single source of truth in `src/data/topicsConfig.js`. To add a topic: add an entry there and drop the matching `.md` + `.py` files in the corresponding `content/` subfolder.
 
 ## Firestore Security Rules
 

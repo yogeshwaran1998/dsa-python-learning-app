@@ -34,13 +34,13 @@ The app has two learning tracks:
 - **Python** — 26 topics, IDs like `01_syntax_datatypes`, `02_operators`, etc.
 - **DSA** — 20 topics, IDs like `01_arrays_strings`, `02_two_pointers_sliding_window`, etc.
 
-Each topic has a `.md` (theory) and `.py` (code) file. The **source of truth is the repo root** (`../01_arrays_strings/…`, `../00_python_fundamentals/…`). `scripts/sync-content.mjs` mirrors those folders into `public/content/` so Vite can serve them statically; it runs automatically via the `predev`/`prebuild` npm hooks (and `npm run sync-content` manually). `public/content/` is generated and git-ignored — never edit it by hand.
+Each topic has a `.md` (theory) and `.py` (code) file. The **source of truth is `content/`** inside this repo (`content/01_arrays_strings/…`, `content/00_python_fundamentals/…`). `scripts/sync-content.mjs` mirrors those folders into `public/content/` so Vite can serve them statically; it runs automatically via the `predev`/`prebuild` npm hooks (and `npm run sync-content` manually). `public/content/` is generated and git-ignored — never edit it by hand.
 
 Served paths (see `contentBasePath()` in `src/data/topicsConfig.js`):
 - Python: `public/content/00_python_fundamentals/{topic_id}/{topic.mdFile|pyFile}`
 - DSA: `public/content/{topic_id}/{topic.mdFile|pyFile}`
 
-The topic lists with metadata (id, title, mdFile, pyFile, category) are the **single source of truth in `src/data/topicsConfig.js`** (`pythonTopics`, `dsaTopics`, plus `getTopics()`/`contentBasePath()` helpers and `PYTHON_TOPICS_COUNT`/`DSA_TOPICS_COUNT`). `TopicDetail.jsx`, `DSATopics.jsx`, `PythonTopics.jsx`, `Home.jsx`, and `CommandPalette.jsx` all import from it. When adding or renaming a topic, edit **only** `topicsConfig.js` and add the matching files under the corresponding root folder.
+The topic lists with metadata (id, title, mdFile, pyFile, category) are the **single source of truth in `src/data/topicsConfig.js`** (`pythonTopics`, `dsaTopics`, plus `getTopics()`/`contentBasePath()` helpers and `PYTHON_TOPICS_COUNT`/`DSA_TOPICS_COUNT`). `TopicDetail.jsx`, `DSATopics.jsx`, `PythonTopics.jsx`, `Home.jsx`, and `CommandPalette.jsx` all import from it. When adding or renaming a topic, edit **only** `topicsConfig.js` and add the matching files under the corresponding folder inside `content/`.
 
 ### Routing & `TopicDetail`
 

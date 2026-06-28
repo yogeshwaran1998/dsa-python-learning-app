@@ -1,5 +1,5 @@
-// Mirrors the study material from the repo root into public/content so Vite can
-// serve it statically. The root folders are the single source of truth; this
+// Mirrors the study material from content/ into public/content so Vite can
+// serve it statically. The content/ folder is the single source of truth; this
 // generated copy is git-ignored. Runs automatically via the predev/prebuild
 // npm hooks, and can be run manually with `npm run sync-content`.
 //
@@ -13,13 +13,13 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const APP_ROOT = resolve(__dirname, '..');
-const REPO_ROOT = resolve(APP_ROOT, '..');
+const CONTENT_SRC = join(APP_ROOT, 'content');
 const DEST = join(APP_ROOT, 'public', 'content');
 
-// Topic source folders at the repo root: the python fundamentals bundle plus
-// every NN_* DSA chapter. Excludes the app folder itself.
+// Topic source folders inside content/: the python fundamentals bundle plus
+// every NN_* DSA chapter.
 async function topicFolders() {
-  const entries = await readdir(REPO_ROOT, { withFileTypes: true });
+  const entries = await readdir(CONTENT_SRC, { withFileTypes: true });
   return entries
     .filter((e) => e.isDirectory() && /^\d{2}_/.test(e.name))
     .map((e) => e.name)
@@ -49,7 +49,7 @@ async function main() {
   const folders = await topicFolders();
   let copied = 0;
   for (const folder of folders) {
-    const src = join(REPO_ROOT, folder);
+    const src = join(CONTENT_SRC, folder);
     if (!(await stat(src)).isDirectory()) continue;
     await copyContentFiles(src, join(DEST, folder));
     copied += 1;
