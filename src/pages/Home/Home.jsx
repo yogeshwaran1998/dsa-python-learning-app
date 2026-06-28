@@ -95,7 +95,7 @@ const Home = () => {
             real technical interviews — and track every topic you complete.
           </p>
 
-          {/* Search launcher (opens ⌘K palette) */}
+          {/* Search launcher (opens ⌘K / Ctrl+K palette) */}
           <button
             onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
             className="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl bg-card border border-default text-secondary hover:border-default-hover hover:shadow-md transition-all"
@@ -104,7 +104,11 @@ const Home = () => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <span className="text-sm">Search all topics…</span>
-            <kbd className="text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 font-sans">⌘K</kbd>
+            {navigator.maxTouchPoints === 0 && (
+              <kbd className="text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 font-sans">
+                {/Macintosh/.test(navigator.userAgent) ? '⌘K' : 'Ctrl+K'}
+              </kbd>
+            )}
           </button>
         </div>
 
