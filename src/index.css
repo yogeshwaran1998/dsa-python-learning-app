@@ -128,3 +128,121 @@ body {
   color: var(--color-text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
+
+/* ------------------------------------------------------------------ */
+/* Styled diagrams for theory content.                                 */
+/* Authored as raw HTML in markdown (rehype-raw) using these semantic   */
+/* classes so they survive Tailwind's build-time class scanning and     */
+/* adapt to dark mode. Keep the class surface small and composable.     */
+/* ------------------------------------------------------------------ */
+
+/* Figure wrapper: scrollable on small screens, optional caption. */
+.dsa-diagram {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  padding: 1.25rem;
+  margin: 0 0 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  background-color: var(--color-bg-secondary);
+  overflow-x: auto;
+}
+.dsa-diagram--col { flex-direction: column; align-items: flex-start; }
+.dsa-diagram--center { justify-content: center; }
+.dsa-caption {
+  width: 100%;
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* A box "node": one or more cells side by side. */
+.dnode {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1.5px solid var(--color-accent);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: var(--color-card-bg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+.dcell {
+  padding: 0.4rem 0.7rem;
+  color: var(--color-text-primary);
+}
+.dcell + .dcell { border-left: 1.5px solid var(--color-accent); }
+.dcell--muted { color: var(--color-text-muted); }
+.dcell--label {
+  background-color: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* Variants for node roles. */
+.dnode--null { border-color: var(--color-border-hover); color: var(--color-text-muted); }
+.dnode--null .dcell { color: var(--color-text-muted); }
+.dnode--green { border-color: #10b981; }
+.dnode--green .dcell + .dcell { border-left-color: #10b981; }
+.dnode--highlight { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 30%, transparent); }
+
+/* Arrow connector between nodes. */
+.darrow {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-accent);
+  font-weight: 700;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+.darrow--muted { color: var(--color-text-muted); }
+
+/* Inline pill for an index/label above a value. */
+.dindex {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8125rem;
+}
+.dindex small { color: var(--color-text-muted); font-size: 0.6875rem; }
+.dindex b {
+  min-width: 1.75rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.375rem;
+  background-color: var(--color-card-bg);
+  font-weight: 600;
+  text-align: center;
+}
+
+/* SVG-based diagrams (trees, graphs) — theme-aware via CSS variables. */
+.dsa-svg { width: 100%; }
+.dsa-svg svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+.tree-edge { stroke: var(--color-border-hover); stroke-width: 2; fill: none; }
+.tree-edge--accent { stroke: var(--color-accent); }
+.tree-node-shape {
+  fill: var(--color-card-bg);
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+.tree-node-shape--null { stroke: var(--color-border-hover); stroke-dasharray: 4 3; fill: var(--color-bg-tertiary); }
+.tree-node-shape--green { stroke: #10b981; }
+.tree-label {
+  fill: var(--color-text-primary);
+  font: 600 13px ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+.tree-label--muted { fill: var(--color-text-muted); font-weight: 400; }
+.tree-edge-label {
+  fill: var(--color-text-muted);
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-anchor: middle;
+}

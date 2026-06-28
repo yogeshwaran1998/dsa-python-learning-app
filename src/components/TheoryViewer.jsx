@@ -1,69 +1,48 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import rehypeRaw from 'rehype-raw';
+import rehypeSlug from 'rehype-slug';
+import rehypePrism from 'rehype-prism-plus';
 
 /**
- * TheoryViewer - A component to display markdown theory content
- * Features:
- * - Uses react-markdown to render .md files
- * - Light background styling with book icon
- * - Proper markdown styling similar to VS Code
- * - Table of contents with smooth scrolling
- * - Responsive design
+ * TheoryViewer - renders a topic's markdown theory.
+ *
+ * - `remark-gfm` for tables, task lists, strikethrough, autolinks.
+ * - `rehype-slug` adds GitHub-style ids to headings so the in-document Table of
+ *   Contents links (e.g. `#common-patterns`) resolve reliably — no hand-rolled
+ *   slugger that can drift from the anchors the markdown itself generates.
+ * - `rehype-prism-plus` syntax-highlights fenced code blocks (token styles come
+ *   from the Prism theme imported by CodeViewer).
+ * - `rehype-raw` lets the (trusted, in-repo) markdown embed curated HTML/SVG for
+ *   styled diagrams, which are styled by the `.dsa-diagram*` classes in
+ *   index.css. Content is authored by us, so raw HTML is safe here.
  */
-/**
- * Helper function to generate consistent IDs from heading text
- * This ensures TOC links match the heading IDs
- */
-const generateId = (children) => {
-  // Convert to string if it's a React node
-  const text = String(children);
-  // Remove special characters, replace spaces with hyphens, lowercase
-  return text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+const smoothScrollToId = (id) => {
+  const el = document.getElementById(id);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return true;
+  }
+  return false;
 };
 
 const TheoryViewer = ({ content, title }) => {
-
-  // Handle URL hash on initial load
+  // On mount, honor a hash already present in the URL.
   useEffect(() => {
     const hash = window.location.hash;
-    if (hash) {
-      const targetId = hash.substring(1);
-      // Small delay to ensure content is rendered
-      setTimeout(() => {
-        const element = document.getElementById(targetId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 100);
+    if (hash && hash.length > 1) {
+      const id = decodeURIComponent(hash.substring(1));
+      const t = setTimeout(() => smoothScrollToId(id), 100);
+      return () => clearTimeout(t);
     }
-  }, []);
+  }, [content]);
 
-  // Handle TOC link clicks for smooth scrolling
-  const handleTocClick = (e, targetId) => {
-    e.preventDefault();
-    console.log('Attempting to scroll to:', targetId);
-    const element = document.getElementById(targetId);
-    if (element) {
-      console.log('Found element, scrolling...');
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } else {
-      console.log('Element not found:', targetId);
-      // Try with different ID formats
-      const variations = [
-        targetId,
-        targetId.replace(/-/g, ''),
-        targetId.replace(/-/g, ' '),
-      ];
-      for (const variation of variations) {
-        const el = document.getElementById(variation);
-        if (el) {
-          console.log('Found with variation:', variation);
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          return;
-        }
-      }
-    }
+  const headingClasses = {
+    h1: 'text-2xl font-bold text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-600 pb-2 mb-4 mt-6 scroll-mt-24',
+    h2: 'text-xl font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-3 scroll-mt-24',
+    h3: 'text-lg font-medium text-gray-700 dark:text-gray-200 mt-4 mb-2 scroll-mt-24',
+    h4: 'text-base font-medium text-gray-700 dark:text-gray-200 mt-3 mb-2 scroll-mt-24',
   };
 
   return (
@@ -96,145 +75,80 @@ const TheoryViewer = ({ content, title }) => {
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeRaw, rehypeSlug, [rehypePrism, { ignoreMissing: true }]]}
           components={{
-            // Headings with IDs for TOC linking - using consistent ID generation
-            h1: ({ children, ...props }) => {
-              const id = generateId(children);
-              return (
-                <h1
-                  id={id}
-                  className="text-2xl font-bold text-gray-900 dark:text-white border-b border-gray-300 dark:border-gray-600 pb-2 mb-4 mt-6"
-                >
-                  {children}
-                </h1>
-              );
-            },
-            h2: ({ children, ...props }) => {
-              const id = generateId(children);
-              return (
-                <h2
-                  id={id}
-                  className="text-xl font-semibold text-gray-800 dark:text-gray-100 mt-6 mb-3"
-                >
-                  {children}
-                </h2>
-              );
-            },
-            h3: ({ children, ...props }) => {
-              const id = generateId(children);
-              return (
-                <h3
-                  id={id}
-                  className="text-lg font-medium text-gray-700 dark:text-gray-200 mt-4 mb-2"
-                >
-                  {children}
-                </h3>
-              );
-            },
-            h4: ({ children, ...props }) => {
-              const id = generateId(children);
-              return (
-                <h4
-                  id={id}
-                  className="text-base font-medium text-gray-700 dark:text-gray-200 mt-3 mb-2"
-                >
-                  {children}
-                </h4>
-              );
-            },
-            // Paragraphs
+            // Headings keep the id rehype-slug injects (spread via ...props) so
+            // TOC anchors resolve.
+            h1: ({ children, ...props }) => <h1 {...props} className={headingClasses.h1}>{children}</h1>,
+            h2: ({ children, ...props }) => <h2 {...props} className={headingClasses.h2}>{children}</h2>,
+            h3: ({ children, ...props }) => <h3 {...props} className={headingClasses.h3}>{children}</h3>,
+            h4: ({ children, ...props }) => <h4 {...props} className={headingClasses.h4}>{children}</h4>,
             p: ({ children }) => (
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-                {children}
-              </p>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">{children}</p>
             ),
-            // Links - scroll to section within page
-            a: ({ href, children, ...props }) => {
-              // Check if it's an internal anchor link
+            // Internal anchors smooth-scroll; external links open in a new tab.
+            a: ({ href, children }) => {
               if (href && href.startsWith('#') && href.length > 1) {
-                // TOC link - smooth scroll
-                const targetId = href.substring(1);
+                const targetId = decodeURIComponent(href.substring(1));
                 return (
                   <a
                     href={href}
-                    onClick={(e) => handleTocClick(e, targetId)}
+                    onClick={(e) => {
+                      if (smoothScrollToId(targetId)) e.preventDefault();
+                    }}
                     className="text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                   >
                     {children}
                   </a>
                 );
               }
-
-              // External links - open in new tab
               return (
-                <a
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline"
-                >
+                <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
                   {children}
                 </a>
               );
             },
-            // Unordered lists
             ul: ({ children }) => (
-              <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 mb-4 space-y-1">
-                {children}
-              </ul>
+              <ul className="list-disc pl-6 text-gray-600 dark:text-gray-300 mb-4 space-y-1">{children}</ul>
             ),
-            // Ordered lists
             ol: ({ children }) => (
-              <ol className="list-decimal pl-6 text-gray-600 dark:text-gray-300 mb-4 space-y-1">
-                {children}
-              </ol>
+              <ol className="list-decimal pl-6 text-gray-600 dark:text-gray-300 mb-4 space-y-1">{children}</ol>
             ),
-            // List items
-            li: ({ children }) => (
-              <li className="text-gray-600 dark:text-gray-300 mb-1">
-                {children}
-              </li>
-            ),
-            // Inline code
-            code: ({ inline, className, children }) => {
-              if (inline) {
+            li: ({ children }) => <li className="text-gray-600 dark:text-gray-300 mb-1">{children}</li>,
+            // Inline vs. block code. Block code is either tagged (rehype-prism
+            // adds a `language-*` class) OR an untagged fenced block (ASCII
+            // diagrams, example I/O) — which still spans multiple lines. Only
+            // genuinely inline code (no class, single line) gets pill styling;
+            // everything else flows through the <pre> path so it stays
+            // monospace and aligned.
+            code: ({ className, children, ...props }) => {
+              const isInline = !className && !String(children).includes('\n');
+              if (isInline) {
                 return (
                   <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600 dark:text-pink-400">
                     {children}
                   </code>
                 );
               }
-              return (
-                <code className={className}>
-                  {children}
-                </code>
-              );
+              return <code className={className} {...props}>{children}</code>;
             },
-            // Code blocks
+            // leading-5 keeps box-drawing diagrams connected vertically.
             pre: ({ children }) => (
-              <pre className="bg-[#1e1e1e] text-gray-300 p-4 rounded-lg overflow-x-auto mb-4 text-sm font-mono">
+              <pre className="bg-[#1e1e1e] text-gray-300 p-4 rounded-lg overflow-x-auto mb-4 text-sm font-mono leading-5">
                 {children}
               </pre>
             ),
-            // Blockquotes
             blockquote: ({ children }) => (
               <blockquote className="border-l-4 border-blue-500 pl-4 italic text-gray-600 dark:text-gray-400 my-4">
                 {children}
               </blockquote>
             ),
-            // Tables
             table: ({ children }) => (
               <div className="overflow-x-auto mb-4">
-                <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">
-                  {children}
-                </table>
+                <table className="w-full border-collapse border border-gray-300 dark:border-gray-600">{children}</table>
               </div>
             ),
-            thead: ({ children }) => (
-              <thead className="bg-gray-100 dark:bg-gray-700">
-                {children}
-              </thead>
-            ),
+            thead: ({ children }) => <thead className="bg-gray-100 dark:bg-gray-700">{children}</thead>,
             th: ({ children }) => (
               <th className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-left text-gray-700 dark:text-gray-200 font-semibold">
                 {children}
@@ -245,19 +159,9 @@ const TheoryViewer = ({ content, title }) => {
                 {children}
               </td>
             ),
-            // Horizontal rule
             hr: () => <hr className="border-gray-300 dark:border-gray-600 my-6" />,
-            // Strong and emphasis
-            strong: ({ children }) => (
-              <strong className="font-semibold text-gray-900 dark:text-white">
-                {children}
-              </strong>
-            ),
-            em: ({ children }) => (
-              <em className="italic text-gray-700 dark:text-gray-300">
-                {children}
-              </em>
-            ),
+            strong: ({ children }) => <strong className="font-semibold text-gray-900 dark:text-white">{children}</strong>,
+            em: ({ children }) => <em className="italic text-gray-700 dark:text-gray-300">{children}</em>,
           }}
         >
           {content}

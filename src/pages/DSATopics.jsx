@@ -2,32 +2,9 @@
 
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
+import UserMenu from '../components/UserMenu';
 import { useProgress } from '../hooks/useProgress';
-import { useAuth } from '../contexts/AuthContext';
-
-// DSA Topics - using folder names as IDs (matching TopicDetail)
-const dsaTopics = [
-  { id: '01_arrays_strings', title: 'Arrays & Strings', category: 'Fundamentals' },
-  { id: '02_two_pointers_sliding_window', title: 'Two Pointers & Sliding Window', category: 'Fundamentals' },
-  { id: '03_linked_lists', title: 'Linked Lists', category: 'Data Structures' },
-  { id: '04_stacks', title: 'Stacks', category: 'Data Structures' },
-  { id: '05_queues', title: 'Queues', category: 'Data Structures' },
-  { id: '06_hash_tables', title: 'Hash Tables', category: 'Data Structures' },
-  { id: '07_sets', title: 'Sets', category: 'Data Structures' },
-  { id: '08_sorting', title: 'Sorting', category: 'Algorithms' },
-  { id: '09_searching', title: 'Searching', category: 'Algorithms' },
-  { id: '10_recursion', title: 'Recursion', category: 'Algorithms' },
-  { id: '11_binary_trees', title: 'Binary Trees', category: 'Data Structures' },
-  { id: '12_bst', title: 'Binary Search Trees', category: 'Data Structures' },
-  { id: '13_tries', title: 'Tries', category: 'Data Structures' },
-  { id: '14_graphs', title: 'Graphs', category: 'Data Structures' },
-  { id: '15_heaps', title: 'Heaps', category: 'Data Structures' },
-  { id: '16_union_find', title: 'Union Find', category: 'Data Structures' },
-  { id: '17_dp', title: 'Dynamic Programming', category: 'Advanced' },
-  { id: '18_greedy', title: 'Greedy', category: 'Algorithms' },
-  { id: '19_bit_manipulation', title: 'Bit Manipulation', category: 'Algorithms' },
-  { id: '20_patterns', title: 'Patterns', category: 'Patterns' },
-];
+import { dsaTopics, dsaCategories } from '../data/topicsConfig';
 
 // Category icons
 const CategoryIcon = ({ category }) => {
@@ -62,16 +39,7 @@ const CategoryIcon = ({ category }) => {
 };
 
 function DSATopics() {
-  const { isCompleted, getProgress, isAuthenticated } = useProgress();
-  const { user, logout, isAuthenticated: isAuth } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  const { isCompleted, isAuthenticated } = useProgress();
 
   // Group topics by category
   const groupedTopics = dsaTopics.reduce((acc, topic) => {
@@ -82,8 +50,7 @@ function DSATopics() {
     return acc;
   }, {});
 
-  const categories = ['Fundamentals', 'Data Structures', 'Algorithms', 'Patterns', 'Advanced'];
-  const progress = getProgress('dsa', dsaTopics.length);
+  const categories = dsaCategories;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -113,34 +80,7 @@ function DSATopics() {
             </div>
             <div className="flex items-center gap-4">
               {/* Auth UI */}
-              {isAuth ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-                    {user?.email}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    to="/login"
-                    className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
+              <UserMenu />
               <ThemeToggle />
             </div>
           </div>

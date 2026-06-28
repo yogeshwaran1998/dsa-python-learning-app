@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../../components/ThemeToggle';
+import UserMenu from '../../components/UserMenu';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProgress } from '../../hooks/useProgress';
-
-// Total number of topics
-const PYTHON_TOPICS_COUNT = 26;
-const DSA_TOPICS_COUNT = 20;
+import { PYTHON_TOPICS_COUNT, DSA_TOPICS_COUNT } from '../../data/topicsConfig';
 
 /**
  * Home - Landing page for the DSA Learning App
@@ -17,19 +15,11 @@ const DSA_TOPICS_COUNT = 20;
  * - Auth UI (login/logout)
  */
 const Home = () => {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { getProgress, pythonCount, dsaCount, resetProgress, loading } = useProgress();
 
   const pythonProgress = getProgress('python', PYTHON_TOPICS_COUNT);
   const dsaProgress = getProgress('dsa', DSA_TOPICS_COUNT);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   const topics = [
     {
@@ -83,47 +73,39 @@ const Home = () => {
     <div className="min-h-screen bg-primary p-6 md:p-12">
       {/* Header with Theme Toggle and Auth */}
       <div className="max-w-6xl mx-auto mb-8 flex justify-end items-center gap-4">
-        {isAuthenticated ? (
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-              {user?.email}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <Link
-              to="/login"
-              className="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-            >
-              Sign Up
-            </Link>
-          </div>
-        )}
+        <UserMenu />
         <ThemeToggle />
       </div>
 
       <div className="max-w-6xl mx-auto">
-        {/* Welcome Section */}
+        {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-            Welcome to DSA Learning
+          <span className="inline-flex items-center gap-2 px-3 py-1 mb-5 rounded-full text-sm font-medium bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+            Interview-ready in {PYTHON_TOPICS_COUNT + DSA_TOPICS_COUNT} focused lessons
+          </span>
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight mb-4">
+            <span className="text-primary">Master </span>
+            <span className="bg-gradient-to-r from-emerald-500 to-emerald-400 bg-clip-text text-transparent">Python</span>
+            <span className="text-primary"> &amp; </span>
+            <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Algorithms</span>
           </h1>
-          <p className="text-lg text-secondary max-w-2xl mx-auto">
-            Master Python fundamentals and Data Structures & Algorithms with interactive
-            lessons, code examples, and hands-on practice.
+          <p className="text-lg text-secondary max-w-2xl mx-auto mb-8">
+            Theory and runnable code side by side. Learn the patterns that show up in
+            real technical interviews — and track every topic you complete.
           </p>
+
+          {/* Search launcher (opens ⌘K palette) */}
+          <button
+            onClick={() => window.dispatchEvent(new Event('open-command-palette'))}
+            className="inline-flex items-center gap-3 px-4 py-2.5 rounded-xl bg-card border border-default text-secondary hover:border-default-hover hover:shadow-md transition-all"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <span className="text-sm">Search all topics…</span>
+            <kbd className="text-xs border border-gray-300 dark:border-gray-600 rounded px-1.5 py-0.5 font-sans">⌘K</kbd>
+          </button>
         </div>
 
         {/* Progress Section - Only show when logged in */}
@@ -244,7 +226,7 @@ const Home = () => {
                     Start Learning
                   </span>
                   <span className={`text-sm ${colors.text}`}>
-                    {topic.id === 'python' ? '26 Topics' : '20 Topics'}
+                    {topic.id === 'python' ? PYTHON_TOPICS_COUNT : DSA_TOPICS_COUNT} Topics
                   </span>
                 </div>
               </Link>

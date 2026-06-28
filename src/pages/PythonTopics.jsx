@@ -2,38 +2,9 @@
 
 import { Link } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
+import UserMenu from '../components/UserMenu';
 import { useProgress } from '../hooks/useProgress';
-import { useAuth } from '../contexts/AuthContext';
-
-// Python Topics - using folder names as IDs (matching TopicDetail)
-const pythonTopics = [
-  { id: '01_syntax_datatypes', title: 'Syntax & Data Types', category: 'Fundamentals' },
-  { id: '02_operators', title: 'Operators', category: 'Fundamentals' },
-  { id: '03_control_flow', title: 'Control Flow', category: 'Fundamentals' },
-  { id: '04_lists', title: 'Lists', category: 'Data Structures' },
-  { id: '05_dictionaries', title: 'Dictionaries', category: 'Data Structures' },
-  { id: '06_sets', title: 'Sets', category: 'Data Structures' },
-  { id: '07_tuples', title: 'Tuples', category: 'Data Structures' },
-  { id: '08_comprehensions', title: 'Comprehensions', category: 'Advanced Features' },
-  { id: '09_builtin_functions', title: 'Builtin Functions', category: 'Advanced Features' },
-  { id: '10_functions', title: 'Functions', category: 'Advanced Features' },
-  { id: '11_two_pointers', title: 'Two Pointers', category: 'Patterns' },
-  { id: '12_sliding_window', title: 'Sliding Window', category: 'Patterns' },
-  { id: '13_prefix_sums', title: 'Prefix Sums', category: 'Patterns' },
-  { id: '14_hashing_patterns', title: 'Hashing Patterns', category: 'Patterns' },
-  { id: '15_bfs_dfs', title: 'BFS & DFS', category: 'Patterns' },
-  { id: '16_binary_search', title: 'Binary Search', category: 'Patterns' },
-  { id: '17_union_find', title: 'Union Find', category: 'Patterns' },
-  { id: '18_heaps', title: 'Heaps', category: 'Patterns' },
-  { id: '19_oop_basics', title: 'OOP Basics', category: 'Additional' },
-  { id: '20_io_performance', title: 'I/O Performance', category: 'Additional' },
-  { id: '21_complexity', title: 'Complexity', category: 'Additional' },
-  { id: '22_python_idioms', title: 'Python Idioms', category: 'Additional' },
-  { id: '23_itertools', title: 'Itertools', category: 'Additional' },
-  { id: '24_common_pitfalls', title: 'Common Pitfalls', category: 'Additional' },
-  { id: '25_problem_solving', title: 'Problem Solving', category: 'Additional' },
-  { id: '26_leetcode_patterns', title: 'LeetCode Patterns', category: 'Additional' },
-];
+import { pythonTopics, pythonCategories } from '../data/topicsConfig';
 
 // Category icons
 const CategoryIcon = ({ category }) => {
@@ -68,16 +39,7 @@ const CategoryIcon = ({ category }) => {
 };
 
 function PythonTopics() {
-  const { isCompleted, getProgress, isAuthenticated } = useProgress();
-  const { user, logout, isAuthenticated: isAuth } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
+  const { isCompleted, isAuthenticated } = useProgress();
 
   // Group topics by category
   const groupedTopics = pythonTopics.reduce((acc, topic) => {
@@ -88,8 +50,7 @@ function PythonTopics() {
     return acc;
   }, {});
 
-  const categories = ['Fundamentals', 'Data Structures', 'Advanced Features', 'Patterns', 'Additional'];
-  const progress = getProgress('python', pythonTopics.length);
+  const categories = pythonCategories;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -119,34 +80,7 @@ function PythonTopics() {
             </div>
             <div className="flex items-center gap-4">
               {/* Auth UI */}
-              {isAuth ? (
-                <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
-                    {user?.email}
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    to="/login"
-                    className="px-3 py-1.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="px-3 py-1.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
+              <UserMenu />
               <ThemeToggle />
             </div>
           </div>

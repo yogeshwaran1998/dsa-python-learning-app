@@ -1,23 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import Prism from 'prismjs';
 import 'prismjs/components/prism-python';
 import 'prismjs/themes/prism-tomorrow.css';
 
 /**
- * CodeViewer - A component to display code with syntax highlighting
- * Features:
- * - Uses prismjs for syntax highlighting (Python-focused)
- * - Dark theme for code display (like a code editor)
- * - Shows line numbers in a clean way
- * - Includes a copy-to-clipboard button
- * - Terminal/code icon indicator
+ * CodeViewer - displays code with Prism syntax highlighting, line numbers, a
+ * copy button, and click-to-highlight line anchoring.
+ *
+ * Highlighting is memoized per `code`/`language` change (via useMemo) instead of
+ * re-running on every render, and we no longer call the global
+ * `Prism.highlightAll()` — each line is tokenized exactly once.
  */
 const CodeViewer = ({ code, language = 'python', title }) => {
   const [copied, setCopied] = useState(false);
+  const [activeLine, setActiveLine] = useState(null);
 
-  useEffect(() => {
-    Prism.highlightAll();
-  }, [code]);
+  const grammar = Prism.languages[language] || Prism.languages.python;
+
+  // Tokenize once per code change. Per-line so we can render a line-number
+  // gutter and anchor individual lines.
+  const highlightedLines = useMemo(
+    () => code.split('\n').map((line) => Prism.highlight(line || ' ', grammar, language)),
+    [code, language, grammar]
+  );
 
   const handleCopy = async () => {
     try {
@@ -28,9 +33,6 @@ const CodeViewer = ({ code, language = 'python', title }) => {
       console.error('Failed to copy code:', err);
     }
   };
-
-  // Split code into lines for line numbers
-  const lines = code.split('\n');
 
   return (
     <div className="code-viewer h-full overflow-auto">
@@ -46,11 +48,7 @@ const CodeViewer = ({ code, language = 'python', title }) => {
               stroke="currentColor"
               strokeWidth={2}
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
           </div>
           <div>
@@ -67,12 +65,11 @@ const CodeViewer = ({ code, language = 'python', title }) => {
         </div>
       </div>
 
-      {/* Code container with dark theme - clean layout without table borders */}
+      {/* Code container with dark theme */}
       <div className="rounded-xl overflow-hidden border border-gray-300 dark:border-gray-700 bg-[#1e1e1e]">
         {/* Toolbar with copy button */}
         <div className="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-[#3c3c3c]">
           <div className="flex items-center gap-2">
-            {/* Window controls */}
             <div className="flex gap-1.5">
               <span className="w-3 h-3 rounded-full bg-red-500"></span>
               <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
@@ -81,7 +78,6 @@ const CodeViewer = ({ code, language = 'python', title }) => {
             <span className="ml-2 text-xs text-gray-400 font-mono">main.py</span>
           </div>
 
-          {/* Copy button */}
           <button
             onClick={handleCopy}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md bg-[#3c3c3c] hover:bg-[#4a4a4a] text-gray-300 transition-colors duration-200"
@@ -104,27 +100,35 @@ const CodeViewer = ({ code, language = 'python', title }) => {
           </button>
         </div>
 
-        {/* Code with line numbers - no table borders */}
+        {/* Code with line numbers */}
         <div className="overflow-x-auto">
           <pre className="p-0 m-0 bg-transparent">
             <code className="block">
-              {lines.map((line, index) => (
-                <div key={index} className="flex hover:bg-[#2a2d2e]">
-                  <span className="flex-shrink-0 w-12 text-right pr-3 text-gray-500 select-none text-sm font-mono leading-6">
-                    {index + 1}
-                  </span>
-                  <span
-                    className="flex-1 text-sm font-mono leading-6 text-gray-300 whitespace-pre"
-                    dangerouslySetInnerHTML={{
-                      __html: Prism.highlight(
-                        line || ' ',
-                        Prism.languages[language] || Prism.languages.python,
-                        language
-                      ),
-                    }}
-                  />
-                </div>
-              ))}
+              {highlightedLines.map((html, index) => {
+                const lineNo = index + 1;
+                const isActive = activeLine === lineNo;
+                return (
+                  <div
+                    key={index}
+                    className={`flex ${isActive ? 'bg-[#3a3d41]' : 'hover:bg-[#2a2d2e]'}`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveLine(isActive ? null : lineNo)}
+                      className={`flex-shrink-0 w-12 text-right pr-3 select-none text-sm font-mono leading-6 cursor-pointer ${
+                        isActive ? 'text-blue-400' : 'text-gray-500 hover:text-gray-300'
+                      }`}
+                      aria-label={`Toggle highlight on line ${lineNo}`}
+                    >
+                      {lineNo}
+                    </button>
+                    <span
+                      className="flex-1 text-sm font-mono leading-6 text-gray-300 whitespace-pre"
+                      dangerouslySetInnerHTML={{ __html: html }}
+                    />
+                  </div>
+                );
+              })}
             </code>
           </pre>
         </div>
