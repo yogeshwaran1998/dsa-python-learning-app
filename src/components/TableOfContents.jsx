@@ -64,7 +64,7 @@ const TableOfContents = ({ containerId, contentKey, accent = 'blue' }) => {
   };
 
   return (
-    <nav aria-label="On this page" className="sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
+    <nav aria-label="On this page" className="sticky top-20 max-h-[calc(100vh-6rem)] overflow-y-auto">
       <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 mb-3 px-3">
         On this page
       </p>

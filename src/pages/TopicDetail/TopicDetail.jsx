@@ -243,7 +243,7 @@ const TopicDetail = ({ type = 'dsa' }) => {
           <>
             {/* View mode toolbar — tablet/desktop only */}
             {!isMobile && (
-              <div className="flex justify-end mb-4">
+              <div className="sticky top-0 z-20 flex justify-end -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-4 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
                 <ViewModeToggle
                   value={viewMode}
                   onChange={setViewMode}
