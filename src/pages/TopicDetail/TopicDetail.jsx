@@ -129,24 +129,24 @@ const TopicDetail = ({ type = 'dsa' }) => {
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
               <Link
                 to={type === 'python' ? '/python' : '/dsa'}
-                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                className="flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white shrink-0"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
                 Back
               </Link>
-              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600 shrink-0" />
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white truncate">
                 {currentTopic.title}
               </h1>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+              <span className="text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap shrink-0">
                 {currentIndex + 1} / {topics.length}
               </span>
               {/* Mark as Complete Button - Only show when logged in */}
@@ -164,7 +164,7 @@ const TopicDetail = ({ type = 'dsa' }) => {
                     }
                   }}
                   disabled={progressLoading}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors shrink-0 ${
                     isCurrentCompleted
                       ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
@@ -172,17 +172,17 @@ const TopicDetail = ({ type = 'dsa' }) => {
                 >
                   {isCurrentCompleted ? (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                       </svg>
-                      Completed
+                      <span className="hidden sm:inline">Completed</span>
                     </>
                   ) : (
                     <>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      Mark Complete
+                      <span className="hidden sm:inline">Mark Complete</span>
                     </>
                   )}
                 </button>
