@@ -5,6 +5,7 @@ import CodeViewer from '../../components/CodeViewer';
 import TableOfContents from '../../components/TableOfContents';
 import ThemeToggle from '../../components/ThemeToggle';
 import UserMenu from '../../components/UserMenu';
+import ViewModeToggle from '../../components/ViewModeToggle';
 import { useProgress } from '../../hooks/useProgress';
 import { useAuth } from '../../contexts/AuthContext';
 import { getTopics, contentBasePath } from '../../data/topicsConfig';
@@ -19,6 +20,7 @@ const TopicDetail = ({ type = 'dsa' }) => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('theory');
   const [isMobile, setIsMobile] = useState(false);
+  const [viewMode, setViewMode] = useState(() => localStorage.getItem('topicViewMode') || 'split');
 
   // Progress tracking
   const { isCompleted, markCompleted, markIncomplete, loading: progressLoading } = useProgress();
@@ -45,6 +47,11 @@ const TopicDetail = ({ type = 'dsa' }) => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Persist view mode preference across topics and sessions
+  useEffect(() => {
+    localStorage.setItem('topicViewMode', viewMode);
+  }, [viewMode]);
 
   useEffect(() => {
     const loadContent = async () => {
@@ -233,28 +240,62 @@ const TopicDetail = ({ type = 'dsa' }) => {
         ) : error ? (
           <div className="text-center text-red-500 dark:text-red-400">{error}</div>
         ) : (
-          <div className={`${isMobile ? 'block' : 'grid grid-cols-2 xl:grid-cols-[200px_1fr_1fr] gap-6'}`}>
-            {/* Table of Contents — desktop XL only */}
+          <>
+            {/* View mode toolbar — tablet/desktop only */}
             {!isMobile && (
-              <div className="hidden xl:block">
-                <TableOfContents
-                  containerId="theory-content"
-                  contentKey={currentTopic.id}
+              <div className="flex justify-end mb-4">
+                <ViewModeToggle
+                  value={viewMode}
+                  onChange={setViewMode}
                   accent={type === 'python' ? 'emerald' : 'blue'}
                 />
               </div>
             )}
 
-            {/* Theory Panel */}
-            <div id="theory-content" className={`min-w-0 ${isMobile && activeTab !== 'theory' ? 'hidden' : ''}`}>
-              <TheoryViewer content={theoryContent} />
-            </div>
+            <div className={
+              isMobile
+                ? 'block'
+                : viewMode === 'theory'
+                  ? 'grid xl:grid-cols-[200px_1fr] gap-6'
+                  : viewMode === 'code'
+                    ? 'grid grid-cols-1 gap-6'
+                    : 'grid grid-cols-2 xl:grid-cols-[200px_1fr_1fr] gap-6'
+            }>
+              {/* Table of Contents — desktop XL only; hidden in code-only mode */}
+              {!isMobile && viewMode !== 'code' && (
+                <div className="hidden xl:block">
+                  <TableOfContents
+                    containerId="theory-content"
+                    contentKey={currentTopic.id}
+                    accent={type === 'python' ? 'emerald' : 'blue'}
+                  />
+                </div>
+              )}
 
-            {/* Code Panel */}
-            <div className={`min-w-0 ${isMobile && activeTab !== 'code' ? 'hidden' : ''}`}>
-              <CodeViewer code={codeContent} />
+              {/* Theory Panel */}
+              <div
+                id="theory-content"
+                className={`min-w-0 ${
+                  (isMobile && activeTab !== 'theory') || (!isMobile && viewMode === 'code')
+                    ? 'hidden'
+                    : ''
+                }`}
+              >
+                <TheoryViewer content={theoryContent} />
+              </div>
+
+              {/* Code Panel */}
+              <div
+                className={`min-w-0 ${
+                  (isMobile && activeTab !== 'code') || (!isMobile && viewMode === 'theory')
+                    ? 'hidden'
+                    : ''
+                }`}
+              >
+                <CodeViewer code={codeContent} />
+              </div>
             </div>
-          </div>
+          </>
         )}
       </div>
 
