@@ -134,9 +134,9 @@ const TopicDetail = ({ type = 'dsa' }) => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between gap-3">
+      <div className="sticky top-0 z-30 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
+          <div className="flex items-center justify-between gap-3 w-full">
             <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
               <Link
                 to={type === 'python' ? '/python' : '/dsa'}
@@ -205,7 +205,7 @@ const TopicDetail = ({ type = 'dsa' }) => {
 
       {/* Mobile Tab Navigation */}
       {isMobile && (
-        <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="sticky top-16 z-20 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
           <div className="flex">
             <button
               onClick={() => setActiveTab('theory')}
@@ -243,7 +243,7 @@ const TopicDetail = ({ type = 'dsa' }) => {
           <>
             {/* View mode toolbar — tablet/desktop only */}
             {!isMobile && (
-              <div className="sticky top-0 z-20 flex justify-end -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-4 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
+              <div className="sticky top-16 z-20 flex justify-end -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 mb-4 bg-gray-50/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
                 <ViewModeToggle
                   value={viewMode}
                   onChange={setViewMode}

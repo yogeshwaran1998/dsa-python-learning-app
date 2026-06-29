@@ -103,7 +103,7 @@ const CodeViewer = ({ code, language = 'python', title }) => {
         {/* Code with line numbers */}
         <div className="overflow-x-auto">
           <pre className="p-0 m-0 bg-transparent">
-            <code className="block">
+            <code className="block w-max min-w-full">
               {highlightedLines.map((html, index) => {
                 const lineNo = index + 1;
                 const isActive = activeLine === lineNo;
